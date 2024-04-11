@@ -38,7 +38,7 @@ export function QualityLevelMeter({
               <div
                 key={index}
                 className={cn(
-                  "h-full overflow-clip flex items-center justify-end",
+                  "h-full overflow-clip flex items-center justify-end transition-all",
                   {
                     "bg-emerald-500": index === 0,
                     "bg-cyan-500": index === 1,
@@ -51,7 +51,7 @@ export function QualityLevelMeter({
                 dir="rtl"
                 style={{ width: `${chance * 100}%` }}
               >
-                <span className="text-xs text-white inline-block px-1.5 truncate">
+                <span className="text-sm text-white font-medium inline-block px-3 truncate">
                   QS {index + 1}
                 </span>
               </div>

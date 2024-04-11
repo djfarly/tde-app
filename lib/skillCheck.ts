@@ -90,6 +90,7 @@ type SkillCheckResultSuccess = {
   type: "success";
   parts: [SkillCheckPart, SkillCheckPart, SkillCheckPart];
   isSuccess: true;
+  remainingSkillPoints: number;
   qualityLevel: number;
 };
 
@@ -97,6 +98,7 @@ type SkillCheckResultFail = {
   type: "fail";
   parts: [SkillCheckPart, SkillCheckPart, SkillCheckPart];
   isSuccess: false;
+  remainingSkillPoints: number;
   qualityLevel: null;
 };
 
@@ -104,6 +106,7 @@ type SkillCheckResultSpectacularSuccess = {
   type: "spectacularSuccess";
   parts: never;
   isSuccess: true;
+  remainingSkillPoints: number;
   qualityLevel: number;
 };
 
@@ -111,6 +114,7 @@ type SkillCheckResultSpectacularFail = {
   type: "spectacularFail";
   parts: never;
   isSuccess: false;
+  remainingSkillPoints: null;
   qualityLevel: null;
 };
 
@@ -118,6 +122,7 @@ type SkillCheckResultCriticalSuccess = {
   type: "criticalSuccess";
   parts: never;
   isSuccess: true;
+  remainingSkillPoints: number;
   qualityLevel: number;
 };
 
@@ -125,6 +130,7 @@ type SkillCheckResultCriticalFail = {
   type: "criticalFail";
   parts: never;
   isSuccess: false;
+  remainingSkillPoints: null;
   qualityLevel: null;
 };
 
@@ -136,6 +142,36 @@ export type SkillCheckResult =
   | SkillCheckResultCriticalSuccess
   | SkillCheckResultCriticalFail;
 
+export const skillCheckResultName = {
+  success: {
+    en: "Success",
+    de: "Erfolg",
+  },
+  fail: {
+    en: "Fail",
+    de: "Fehlschlag",
+  },
+  spectacularSuccess: {
+    en: "Spectacular Success",
+    de: "Spektakulärer Erfolg",
+  },
+  spectacularFail: {
+    en: "Spectacular Fail",
+    de: "Spektakulärer Patzer",
+  },
+  criticalSuccess: {
+    en: "Critical Success",
+    de: "Kritischer Erfolg",
+  },
+  criticalFail: {
+    en: "Critical Fail",
+    de: "Patzer",
+  },
+} as const satisfies Record<
+  SkillCheckResult["type"],
+  { en: string; de: string }
+>;
+
 export const getSkillCheckResult = (
   rolls: Rolls,
   attributes: Attributes,
@@ -146,24 +182,28 @@ export const getSkillCheckResult = (
     return {
       type: "spectacularFail",
       isSuccess: false,
+      remainingSkillPoints: null,
       qualityLevel: null,
     } as SkillCheckResultSpectacularFail;
   } else if (isCriticalFail(rolls)) {
     return {
       type: "criticalFail",
       isSuccess: false,
+      remainingSkillPoints: null,
       qualityLevel: null,
     } as SkillCheckResultCriticalFail;
   } else if (isSpectacularSuccess(rolls)) {
     return {
       type: "spectacularSuccess",
       isSuccess: true,
+      remainingSkillPoints: skillPoints,
       qualityLevel: getQualityLevel(skillPoints),
     } as SkillCheckResultSpectacularSuccess;
   } else if (isCriticalSuccess(rolls)) {
     return {
       type: "criticalSuccess",
       isSuccess: true,
+      remainingSkillPoints: skillPoints,
       qualityLevel: getQualityLevel(skillPoints),
     } as SkillCheckResultCriticalSuccess;
   }
@@ -212,6 +252,7 @@ export const getSkillCheckResult = (
       parts,
       type: "success",
       isSuccess: true,
+      remainingSkillPoints,
       qualityLevel: getQualityLevel(remainingSkillPoints)!,
     } as SkillCheckResultSuccess;
   }
@@ -220,6 +261,7 @@ export const getSkillCheckResult = (
     parts,
     type: "fail",
     isSuccess: false,
+    remainingSkillPoints,
     qualityLevel: null,
   } as SkillCheckResultFail;
 };

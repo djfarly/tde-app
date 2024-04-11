@@ -65,9 +65,11 @@ export function ConditionInput({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
+              variant="secondary"
               size="icon"
               className="rounded-s-none"
               onClick={() => onLevelChange?.(level - 1)}
+              disabled={!onLevelChange}
             >
               <Minus className="size-5" />
             </Button>
@@ -95,10 +97,11 @@ export function ConditionInput({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
+              variant="secondary"
               size="icon"
               className="rounded-e-none"
               onClick={() => onLevelChange?.(level + 1)}
-              disabled={level >= 4}
+              disabled={level >= 4 || !onLevelChange}
             >
               <Plus className="size-5" />
             </Button>
@@ -140,7 +143,9 @@ export function ConditionInput({
               }
               size="xs"
               className="absolute -bottom-2.5 right-1/2 w-max translate-x-1/2"
-              disabled={info.hasFixedEncumbrance}
+              disabled={
+                info.hasFixedEncumbrance || !onIsAlternativeEffectChange
+              }
             >
               {info.conditionLevel.alternativeEffectName[locale]}
             </Toggle>

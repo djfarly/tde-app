@@ -32,10 +32,13 @@ export function ModifierInput({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
+              variant="secondary"
               size="icon"
               className="rounded-s-none"
               onClick={() => onModifierValueChange?.(modifierValue - 1)}
-              disabled={modifierValue <= -MAX_MODIFIER}
+              disabled={
+                modifierValue <= -MAX_MODIFIER || !onModifierValueChange
+              }
             >
               <Minus className="size-5" />
             </Button>
@@ -48,10 +51,11 @@ export function ModifierInput({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
+              variant="secondary"
               size="icon"
               className="rounded-e-none"
               onClick={() => onModifierValueChange?.(modifierValue + 1)}
-              disabled={modifierValue >= MAX_MODIFIER}
+              disabled={modifierValue >= MAX_MODIFIER || !onModifierValueChange}
             >
               <Plus className="size-5" />
             </Button>

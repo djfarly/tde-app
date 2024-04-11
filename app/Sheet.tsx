@@ -124,42 +124,7 @@ export function Sheet({
                     skillPoints={skillPoints}
                   />
                 </TableCell>
-                <TableCell>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      const skillCheckLogEntry = performSkillCheck({
-                        attributeValues: getAttributeValues(skill.attributes),
-                        skillPoints,
-                        characterId: testChar.id,
-                        skillId: skill.id,
-                        modifier: 0,
-                        modifierComponents: {
-                          difficulty: 0,
-                          specialAbilities: 0,
-                          confusion: 0,
-                          encumbrance: 0,
-                          fear: 0,
-                          pain: 0,
-                          paralysis: 0,
-                          rapture: 0,
-                          stupor: 0,
-                        },
-                      });
-                      onAddLogEntry(skillCheckLogEntry);
-                      toast(
-                        skillCheckLogEntry.result.isSuccess
-                          ? `Erfolgreiche Probe auf ${skill.name[locale]} (QS ${skillCheckLogEntry.result.qualityLevel})`
-                          : `Probe auf ${skill.name[locale]} fehlgeschlagen`,
-                        {
-                          description: skillCheckLogEntry.rolls.join(" | "),
-                        }
-                      );
-                    }}
-                  >
-                    <Dices className="size-4" />
-                  </Button>
-                </TableCell>
+                <TableCell>–</TableCell>
               </TableRow>
             );
           })}

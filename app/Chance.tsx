@@ -26,16 +26,16 @@ export function Chance({
   attributes,
   skillPoints,
   modifier = 0,
+  isIncapacitated = false,
 }: {
   attributes: [number, number, number];
   skillPoints: number;
   modifier?: number;
+  isIncapacitated?: boolean;
 }) {
-  const [chance, qualityLevelChances] = calculateChance(
-    attributes,
-    skillPoints,
-    modifier
-  );
+  const [chance, qualityLevelChances] = isIncapacitated
+    ? [0, [0, 0, 0, 0, 0, 0]]
+    : calculateChance(attributes, skillPoints, modifier);
 
   return (
     <QualityLevelMeter

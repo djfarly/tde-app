@@ -12,14 +12,20 @@ const locale = "de";
 export function ActivateConditionMenu({
   conditionIds,
   onActivate,
+  disabled,
 }: {
   conditionIds: ConditionId[];
-  onActivate: (conditionId: ConditionId) => void;
+  onActivate?: (conditionId: ConditionId) => void;
+  disabled?: boolean;
 }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button disabled={conditionIds.length === 0} className="w-max">
+        <Button
+          variant="secondary"
+          disabled={conditionIds.length === 0 || disabled}
+          className="w-max"
+        >
           Zustand aktivieren
         </Button>
       </DropdownMenuTrigger>
@@ -30,7 +36,7 @@ export function ActivateConditionMenu({
           return (
             <DropdownMenuItem
               key={conditionId}
-              onSelect={() => onActivate(conditionId)}
+              onSelect={() => onActivate?.(conditionId)}
             >
               <Icon className="size-5 mr-2" />
               {condition.name[locale]}

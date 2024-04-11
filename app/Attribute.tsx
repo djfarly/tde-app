@@ -26,7 +26,7 @@ function getAttributeValue(attributeId: number) {
 }
 
 const attributeVariants = cva(
-  "h-10 w-8 flex flex-col p-0.5 items-center justify-evenly",
+  "flex flex-col p-0.5 items-center justify-evenly",
   {
     variants: {
       attribute: {
@@ -47,20 +47,32 @@ const attributeVariants = cva(
         // CON: "bg-white text-black",
         // STR: "bg-orange-500 text-white",
       },
+      size: {
+        sm: "h-10 w-8 text-sm",
+        md: "h-12 w-10 text-base",
+      },
     },
     defaultVariants: {
       attribute: "SGC",
+      size: "md",
     },
   }
 );
 
 export interface IconD20Props extends VariantProps<typeof attributeVariants> {
   attributeId: number;
+  className?: string;
+  modifier?: number;
 }
 
 const locale = "de";
 
-export function Attribute({ attributeId, ...props }: IconD20Props) {
+export function Attribute({
+  attributeId,
+  modifier,
+  className,
+  ...props
+}: IconD20Props) {
   const attribute = getAttribute(attributeId);
   const attributeValue = getAttributeValue(attributeId);
 
@@ -69,13 +81,23 @@ export function Attribute({ attributeId, ...props }: IconD20Props) {
     <div
       className={attributeVariants({
         attribute: props.attribute ?? attribute?.shorthand["en"],
+        className,
       })}
     >
-      <span className="text-xs leading-none font-medium text-muted-foreground">
+      <span className="leading-none text-muted-foreground">
         {attribute?.shorthand[locale]}
       </span>
-      <span className="text-sm leading-none tracking-tighter tabular-nums">
-        {attributeValue}
+      <span className="leading-none font-medium tracking-tighter tabular-nums">
+        {modifier ? (
+          <>
+            <span className="line-through opacity-50 inline-block mr-1">
+              {attributeValue}
+            </span>
+            <span>{attributeValue + modifier}</span>
+          </>
+        ) : (
+          attributeValue
+        )}
       </span>
     </div>
     // </div>

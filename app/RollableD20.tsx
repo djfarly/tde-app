@@ -187,39 +187,48 @@ export function RollableD20({
   dieIndex,
 }: RollableD20Props) {
   return (
-    <section className="d20-container">
-      <motion.div
-        className={d20Variants({
-          className: cn(`d20`, side === undefined ? "initial" : undefined),
-          attribute:
-            attribute ??
-            (attributeId !== undefined
-              ? ATTRIBUTE_IDS[attributeId]
-              : undefined),
-        })}
-        style={{
-          z: -60,
-        }}
-        initial={"initial" + (dieIndex ?? 0)}
-        transformTemplate={({ rotateX, rotateY, rotateZ, z }) => {
-          return `translateZ(${z}) rotateY(${rotateY}) rotateX(${rotateX}) rotateZ(${rotateZ})`;
-        }}
-        variants={sideVariants}
-        animate={side ? side.toString() : "initial" + (dieIndex ?? 0)}
-        transition={{
-          type: "spring",
-          stiffness: 250,
-          damping: 50,
-          mass: 0.5,
-          restDelta: 0.01,
-        }}
-      >
-        {sides.map((s) => (
-          <figure key={s} className={`face${s}`}>
-            {s}
-          </figure>
-        ))}
-      </motion.div>
-    </section>
+    <div className="d20-wrapper">
+      <section className="d20-container">
+        <motion.div
+          className={d20Variants({
+            className: cn(`d20`, side === undefined ? "initial" : undefined),
+            attribute:
+              attribute ??
+              (attributeId !== undefined
+                ? ATTRIBUTE_IDS[attributeId]
+                : undefined),
+          })}
+          style={{
+            z: -60,
+          }}
+          initial={"initial" + (dieIndex ?? 0)}
+          transformTemplate={({ rotateX, rotateY, rotateZ, z }) => {
+            return `translateZ(${z}) rotateY(${rotateY}) rotateX(${rotateX}) rotateZ(${rotateZ})`;
+          }}
+          variants={sideVariants}
+          animate={side ? side.toString() : "initial" + (dieIndex ?? 0)}
+          transition={{
+            type: "spring",
+            stiffness: 250,
+            damping: 50,
+            mass: 0.5,
+            restDelta: 0.01,
+          }}
+        >
+          {sides.map((s) => (
+            <figure
+              key={s}
+              className={cn(
+                `face${s}`,
+                s === "20" ? "text-red-900" : undefined,
+                s === "1" ? "text-green-900" : undefined
+              )}
+            >
+              {s}
+            </figure>
+          ))}
+        </motion.div>
+      </section>
+    </div>
   );
 }
