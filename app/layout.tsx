@@ -1,8 +1,20 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import { Inter, Roboto_Slab, Alegreya, Alegreya_Sans } from "next/font/google";
 import "./globals.css";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
-const inter = Inter({ subsets: ["latin"] });
+const alegreya = Alegreya({
+  weight: "variable",
+  subsets: ["latin"],
+  variable: "--font-alegreya",
+});
+const alegreyaSans = Alegreya_Sans({
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+  variable: "--font-alegreya-sans",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,8 +27,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className={cn(alegreya.variable, alegreyaSans.variable)}>
+      <body>
+        <TooltipProvider>{children}</TooltipProvider>
+        <Toaster />
+      </body>
     </html>
   );
 }
