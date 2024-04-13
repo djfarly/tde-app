@@ -3,6 +3,7 @@
 import { attributes, conditions, skills } from "@/lib/skills";
 import { useMemo, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,19 +15,18 @@ import testChar from "@/lib/chars/faffi.json";
 import { getTotalModifierForConditions } from "@/lib/core/conditions";
 import { formatNumberAsModifier } from "@/lib/format";
 import { LogEntry, SkillCheckLogEntry } from "@/lib/log";
+import { performSkillCheck } from "@/lib/performCheck";
+import { skillCheckResultName } from "@/lib/skillCheck";
+import { cn } from "@/lib/utils";
+import { ArrowRight, ChevronRight, Equal } from "lucide-react";
+import Marquee from "react-fast-marquee";
 import { ActivateConditionMenu } from "./ActivateConditionMenu";
+import { Attribute } from "./Attribute";
+import { Chance } from "./Chance";
 import { ConditionInput } from "./ConditionInput";
 import { ModifierInput } from "./ModifierInput";
-import { Attribute, Attributes } from "./Attribute";
-import { Chance } from "./Chance";
-import { Button } from "@/components/ui/button";
-import { performSkillCheck } from "@/lib/performCheck";
-import { toast } from "sonner";
-import { RollableD20 } from "./RollableD20";
-import { D20 } from "@/lib/dice";
-import { skillCheckResultName } from "@/lib/skillCheck";
 import { QualityLevelBadge } from "./QualityLevelBadge";
-import { cn } from "@/lib/utils";
+import { RollableD20 } from "./RollableD20";
 
 // temporary
 const locale = "de";
@@ -97,6 +97,10 @@ export function SkillCheckDialog({
 
   const isRolled = Boolean(lastSkillCheckLogEntry);
 
+  const currentActiveConditions = currentConditions.filter(
+    ({ level }) => level > 0
+  );
+
   return (
     <Dialog open={true} onOpenChange={() => onClose()}>
       <DialogContent>
@@ -110,10 +114,9 @@ export function SkillCheckDialog({
         </div>
         <div className="mt-6 flex flex-col gap-4">
           <div data-modifiers className="flex flex-col gap-6">
-            <div className="flex items-center gap-x-4 gap-y-6 justify-center flex-wrap">
-              {currentConditions
-                .filter(({ level }) => level > 0)
-                .map((condition) => (
+            {currentActiveConditions.length > 0 ? (
+              <div className="flex items-center gap-x-4 gap-y-6 justify-center flex-wrap">
+                {currentActiveConditions.map((condition) => (
                   <ConditionInput
                     effectType="skill"
                     key={condition.id}
@@ -154,7 +157,8 @@ export function SkillCheckDialog({
                     isEncumbranceApplicable={skill.isEncumbranceApplicable}
                   />
                 ))}
-            </div>
+              </div>
+            ) : null}
             <div className="flex flex-col gap-2 items-center">
               <ActivateConditionMenu
                 conditionIds={currentConditions
@@ -221,32 +225,50 @@ export function SkillCheckDialog({
                       : "opacity-0 select-none pointer-events-none"
                   )}
                 >
-                  <div className="flex gap-1 items-center">
-                    <div className="w-16 h-8 leading-8 text-center border border-border rounded-sm">
-                      {lastSkillCheckLogEntry?.skillPoints ?? "-"} FP
+                  <div className="relative">
+                    <div className="flex gap-1 items-center">
+                      <div className="w-16 h-8 leading-8 text-center bg-muted text-muted-foreground border border-border rounded-sm">
+                        {lastSkillCheckLogEntry?.skillPoints ?? "-"} FP
+                        {/* <ArrowRight className="absolute -right-2.5 fill-card top-[calc(50%-10px)] size-5 text-muted-foreground" /> */}
+                      </div>
+                      {parts.map((part) => {
+                        const usedSkillPoints =
+                          lastSkillCheckLogEntry?.result.parts?.[part]
+                            .usedSkillPoints;
+                        return (
+                          <div
+                            key={part}
+                            className="w-16 h-8 leading-8 text-center bg-gradient-to-r from-transparent via-card to-transparent from-15% to-85% empty:via-transparent"
+                          >
+                            {usedSkillPoints && usedSkillPoints > 0
+                              ? `-${usedSkillPoints}`
+                              : null}
+                          </div>
+                        );
+                      })}
+                      <div
+                        className={cn(
+                          "w-16 h-8 leading-8 text-center bg-card border border-border rounded-sm bg-red-200 text-red-900",
+                          {
+                            "bg-green-200 text-green-900":
+                              (lastSkillCheckLogEntry?.result
+                                .remainingSkillPoints ?? -1) >= 0,
+                          }
+                        )}
+                      >
+                        {/* <Equal className="absolute -left-2.5 fill-card top-[calc(50%-10px)] size-5 text-muted-foreground" /> */}
+                        {lastSkillCheckLogEntry?.result.remainingSkillPoints ??
+                          "–"}{" "}
+                        FP
+                      </div>
                     </div>
-                    {parts.map((part) => {
-                      const usedSkillPoints =
-                        lastSkillCheckLogEntry?.result.parts?.[part]
-                          .usedSkillPoints;
-                      return (
-                        <div
-                          key={part}
-                          className="w-16 h-8 leading-8  text-center"
-                        >
-                          {usedSkillPoints && usedSkillPoints > 0
-                            ? `-${usedSkillPoints}`
-                            : null}
-                        </div>
-                      );
-                    })}
-                    <div className="w-16 h-8 leading-8 text-center border border-border rounded-sm">
-                      {lastSkillCheckLogEntry?.result.remainingSkillPoints ??
-                        "–"}{" "}
-                      FP
+                    <div className="absolute inset-0 grid place-items-center -z-10">
+                      <Marquee direction="right" autoFill speed={10}>
+                        <ChevronRight className="size-5 text-border mx-0.5" />
+                      </Marquee>
                     </div>
                   </div>
-                  <div className="text-3xl font-medium text-center">
+                  <div className="text-3xl font-medium text-center mt-2">
                     {skillCheckResultName[
                       lastSkillCheckLogEntry?.result.type!
                     ]?.[locale] ?? "–"}
@@ -275,7 +297,7 @@ export function SkillCheckDialog({
                 </div>
                 <div
                   className={cn(
-                    "absolute inset-0 grid place-items-center gap-1 transition-opacity",
+                    "absolute inset-0 grid place-items-center gap-1 transition-opacity [grid-auto-rows:1fr]",
                     lastSkillCheckLogEntry
                       ? "opacity-0 select-none pointer-events-none"
                       : "opacity-100"

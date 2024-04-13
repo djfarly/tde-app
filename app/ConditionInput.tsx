@@ -48,15 +48,17 @@ export function ConditionInput({
   return (
     <div className="relative w-40 border border-border rounded-lg shadow-lg items-center flex flex-col gap-2 py-5 bg-card text-card-foreground">
       <div className="flex flex-col gap-1 items-center px-4 mt-[-34.5px]">
-        {info.hasFixedEncumbrance ? (
-          isEncumbranceApplicable ? (
-            <ShieldAlert className="size-7 fill-card" />
+        <div className="bg-card rounded-full">
+          {info.hasFixedEncumbrance ? (
+            isEncumbranceApplicable ? (
+              <ShieldAlert className="size-7" />
+            ) : (
+              <ShieldOff className="size-7 text-slate-300" />
+            )
           ) : (
-            <ShieldOff className="size-7 fill-card text-slate-300" />
-          )
-        ) : (
-          <Icon className="size-7 fill-card" />
-        )}
+            <Icon className="size-7" />
+          )}
+        </div>
         <div className="text-base tracking-wide font-semibold">
           {info.condition.name[locale]}
         </div>
