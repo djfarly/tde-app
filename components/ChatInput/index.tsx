@@ -10,6 +10,8 @@ import { rollD6 } from "@/lib/dice";
 import { LogEntry } from "@/lib/log";
 import { CornerDownLeft, Dices } from "lucide-react";
 
+let id = 100;
+
 export default function ChatInput({
   onAddLogEntry,
 }: {
@@ -22,7 +24,7 @@ export default function ChatInput({
         event.preventDefault();
         onAddLogEntry({
           type: "message",
-          id: "1",
+          id: (id++).toString(),
           createdAt: new Date(),
           message: event.currentTarget.message.value,
         });
@@ -56,11 +58,10 @@ export default function ChatInput({
               onClick={() => {
                 onAddLogEntry({
                   type: "message",
-                  id: "1",
+                  id: (id++).toString(),
                   createdAt: new Date(),
                   message: rollD6().toString(),
                 });
-                // scroll chatlog to bottom
               }}
             >
               <Dices className="size-4" />
