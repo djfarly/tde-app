@@ -1,10 +1,47 @@
 import { useCallback, useState } from "react";
 import { _3D20 } from "./dice";
-import { SkillCheckChance, SkillCheckResult } from "./skillCheck";
+import {
+  calculateChance,
+  getSkillCheckResult,
+  SkillCheckChance,
+  SkillCheckResult,
+} from "./skillCheck";
 import { Skill } from "./skills";
 
 export function useLogs() {
-  const [logs, setLogs] = useState<Log>([]);
+  const [logs, setLogs] = useState<Log>([
+    {
+      type: "message",
+      id: "1",
+      createdAt: new Date(1713090868233),
+      message:
+        "Dies ist der Chat. Hier werden alle Aktionen und Ereignisse protokolliert. Schreibe eine Nachricht, oder wähle ein Talent aus, um eine Probe zu machen. Eine Probe könnte z.B. so aussehen:",
+    },
+    {
+      type: "skillCheck",
+      id: "2",
+      createdAt: new Date(1713090868300),
+      characterId: "1",
+      skillId: 5,
+      attributeValues: [14, 14, 14],
+      skillPoints: 6,
+      modifier: -4,
+      modifierComponents: {
+        difficulty: 0,
+        specialAbilities: 0,
+        encumbrance: 0,
+        confusion: 0,
+        fear: 0,
+        pain: 0,
+        paralysis: 0,
+        rapture: 0,
+        stupor: 0,
+      },
+      chance: calculateChance([14, 14, 14], 6, -4),
+      rolls: [1, 15, 8],
+      result: getSkillCheckResult([1, 15, 8], [14, 14, 14], 6, -4),
+    },
+  ]);
 
   const addLogEntry = useCallback((entry: LogEntry) => {
     setLogs((logs) =>

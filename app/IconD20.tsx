@@ -14,7 +14,7 @@ const ATTRIBUTE_IDS = {
   8: "STR",
 } as const;
 
-const d20Variants = cva("size-8 [paint-order:stroke] stroke-border", {
+const d20Variants = cva("size-10 [paint-order:stroke] stroke-border", {
   variants: {
     attribute: {
       COU: "fill-red-200",
@@ -43,13 +43,20 @@ const d20Variants = cva("size-8 [paint-order:stroke] stroke-border", {
 export interface IconD20Props extends VariantProps<typeof d20Variants> {
   side: D20;
   attributeId?: keyof typeof ATTRIBUTE_IDS;
+  className?: string;
 }
 
-export function IconD20({ attribute, attributeId, side }: IconD20Props) {
+export function IconD20({
+  attribute,
+  attributeId,
+  side,
+  className,
+}: IconD20Props) {
   return (
     <div className="relative">
       <Hexagon
         className={d20Variants({
+          className,
           attribute:
             attribute ??
             (attributeId !== undefined
@@ -63,7 +70,7 @@ export function IconD20({ attribute, attributeId, side }: IconD20Props) {
           dominantBaseline="middle"
           textAnchor="middle"
           className={cn(
-            "text-[10px] tracking-tight font-sans stroke-none fill-current translate-y-px",
+            "text-[10px] tracking-tight font-sans stroke-none fill-black translate-y-px",
             {
               "fill-red-900 stroke-1 stroke-red-50 font-bold": side === 20,
               "fill-green-800 stroke-1 stroke-green-50 font-bold": side === 1,

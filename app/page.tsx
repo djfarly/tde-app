@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import Chat from "@/components/Chat";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,17 +18,11 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+  ScrollArea,
+  ScrollAreaViewport,
+  ScrollBar,
+} from "@/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
@@ -36,36 +30,25 @@ import {
 } from "@/components/ui/tooltip";
 import { useLogs } from "@/lib/log";
 import {
-  Bird,
-  CornerDownLeft,
   LifeBuoy,
-  List,
-  Mic,
-  Paperclip,
   PersonStanding,
-  Rabbit,
   Rainbow,
   ScrollText,
-  Settings,
-  Share,
   SquareUser,
   Swords,
   Triangle,
-  Turtle,
   Wand,
 } from "lucide-react";
 import Link from "next/link";
+import { useRef } from "react";
 import { Sheet } from "./Sheet";
-import { attributes, skills } from "@/lib/skills";
-import { IconD20 } from "./IconD20";
-import { Attributes } from "./Attribute";
 
 const locale = "de";
 
 export default function Dashboard() {
   const { addLogEntry, logs } = useLogs();
 
-  console.log(logs);
+  const chatlog = useRef<HTMLDivElement>(null);
 
   return (
     <div className="grid h-screen w-full pl-[56px] [--header-height:57px]">
@@ -234,137 +217,14 @@ export default function Dashboard() {
             Share
           </Button> */}
         </header>
-        <main className="grid flex-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
-          <ScrollArea
-            className="w-full h-[calc(100svh-var(--header-height)-2rem)]  relative hidden md:block lg:col-span-2"
-            viewPortClassName="flex-col items-start gap-8 flex"
-          >
-            <Sheet onAddLogEntry={addLogEntry} />
+        <main className="grid flex-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3 max-h-[calc(100svh-var(--header-height))] overflow-y-clip *:min-h-0">
+          <ScrollArea className="w-full h-full relative hidden md:block lg:col-span-2">
+            <ScrollAreaViewport className="flex-col items-start gap-8 flex">
+              <Sheet onAddLogEntry={addLogEntry} />
+            </ScrollAreaViewport>
+            <ScrollBar />
           </ScrollArea>
-          <div className="">
-            <div className="relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4">
-              <Badge variant="outline" className="absolute right-3 top-3">
-                Output
-              </Badge>
-              <div className="flex-1 py-4">
-                <div className="flex flex-col items-start justify-end h-full gap-2">
-                  {logs.map((log) => (
-                    <div key={log.id} className="flex flex-col gap-px">
-                      <div className="rounded-xl px-3 py-2 bg-white border border-border">
-                        <div className="text-sm leading-6">
-                          {log.type === "skillCheck" ? (
-                            <>
-                              <span>
-                                Probe auf{" "}
-                                <span className="font-semibold">
-                                  {
-                                    skills.find(({ id }) => id === log.skillId)!
-                                      .name[locale]
-                                  }
-                                </span>
-                              </span>
-                              <div className="flex gap-px">
-                                <IconD20
-                                  side={log.rolls[0]}
-                                  attributeId={
-                                    skills.find(({ id }) => id === log.skillId)!
-                                      .attributes[0]
-                                  }
-                                />
-                                <IconD20
-                                  side={log.rolls[1]}
-                                  attributeId={
-                                    skills.find(({ id }) => id === log.skillId)!
-                                      .attributes[1]
-                                  }
-                                />
-                                <IconD20
-                                  side={log.rolls[2]}
-                                  attributeId={
-                                    skills.find(({ id }) => id === log.skillId)!
-                                      .attributes[2]
-                                  }
-                                />
-                              </div>
-                              <div>
-                                <Attributes
-                                  attributes={
-                                    skills.find(({ id }) => id === log.skillId)!
-                                      .attributes
-                                  }
-                                />
-                              </div>
-                              {log.result.type === "success" ? (
-                                <span className="text-xs">
-                                  Peter hat eine Probe auf{" "}
-                                  {
-                                    skills.find(({ id }) => id === log.skillId)!
-                                      .name[locale]
-                                  }{" "}
-                                  mit QS {log.result.qualityLevel} bestanden.
-                                </span>
-                              ) : (
-                                <span className="text-xs">
-                                  Peter hat eine Probe auf{" "}
-                                  {
-                                    skills.find(({ id }) => id === log.skillId)!
-                                      .name[locale]
-                                  }{" "}
-                                  nicht bestanden.
-                                </span>
-                              )}
-                            </>
-                          ) : (
-                            log.message
-                          )}
-                        </div>
-                      </div>
-                      <div className="text-xs px-3 text-muted-foreground">
-                        {log.createdAt.toLocaleTimeString()}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <form
-                className="relative overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
-                x-chunk="dashboard-03-chunk-1"
-              >
-                <Label htmlFor="message" className="sr-only">
-                  Message
-                </Label>
-                <Textarea
-                  id="message"
-                  placeholder="Type your message here..."
-                  className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0"
-                />
-                <div className="flex items-center p-3 pt-0">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Paperclip className="size-4" />
-                        <span className="sr-only">Attach file</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">Attach File</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Mic className="size-4" />
-                        <span className="sr-only">Use Microphone</span>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">Use Microphone</TooltipContent>
-                  </Tooltip>
-                  <Button type="submit" size="sm" className="ml-auto gap-1.5">
-                    Send Message
-                    <CornerDownLeft className="size-3.5" />
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <Chat logEntries={logs} onAddLogEntry={addLogEntry} />
         </main>
       </div>
     </div>

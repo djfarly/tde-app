@@ -265,3 +265,5 @@ export const getSkillCheckResult = (
     qualityLevel: null,
   } as SkillCheckResultFail;
 };
+
+export const skillCheckPartIndices = [0, 1, 2] as const;

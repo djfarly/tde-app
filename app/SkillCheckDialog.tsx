@@ -16,9 +16,9 @@ import { getTotalModifierForConditions } from "@/lib/core/conditions";
 import { formatNumberAsModifier } from "@/lib/format";
 import { LogEntry, SkillCheckLogEntry } from "@/lib/log";
 import { performSkillCheck } from "@/lib/performCheck";
-import { skillCheckResultName } from "@/lib/skillCheck";
+import { skillCheckPartIndices, skillCheckResultName } from "@/lib/skillCheck";
 import { cn } from "@/lib/utils";
-import { ArrowRight, ChevronRight, Equal } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Marquee from "react-fast-marquee";
 import { ActivateConditionMenu } from "./ActivateConditionMenu";
 import { Attribute } from "./Attribute";
@@ -53,8 +53,6 @@ function getAttributeValues(attributeIds: [number, number, number]) {
     number
   ];
 }
-
-const parts = [0, 1, 2] as const;
 
 export function SkillCheckDialog({
   onAddLogEntry,
@@ -197,7 +195,7 @@ export function SkillCheckDialog({
             </div>
             <div className="flex flex-col gap-1">
               <div className="flex gap-1 items-center justify-center">
-                {parts.map((part) => (
+                {skillCheckPartIndices.map((part) => (
                   <Attribute
                     key={part}
                     attributeId={skill.attributes[part]}
@@ -207,7 +205,7 @@ export function SkillCheckDialog({
                 ))}
               </div>
               <div className="flex gap-1 items-center justify-center">
-                {parts.map((part) => (
+                {skillCheckPartIndices.map((part) => (
                   <RollableD20
                     key={part}
                     dieIndex={part}
@@ -231,7 +229,7 @@ export function SkillCheckDialog({
                         {lastSkillCheckLogEntry?.skillPoints ?? "-"} FP
                         {/* <ArrowRight className="absolute -right-2.5 fill-card top-[calc(50%-10px)] size-5 text-muted-foreground" /> */}
                       </div>
-                      {parts.map((part) => {
+                      {skillCheckPartIndices.map((part) => {
                         const usedSkillPoints =
                           lastSkillCheckLogEntry?.result.parts?.[part]
                             .usedSkillPoints;

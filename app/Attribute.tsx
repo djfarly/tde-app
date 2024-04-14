@@ -59,8 +59,9 @@ const attributeVariants = cva(
   }
 );
 
-export interface IconD20Props extends VariantProps<typeof attributeVariants> {
+export interface AttributeProps extends VariantProps<typeof attributeVariants> {
   attributeId: number;
+  attributeValue?: number;
   className?: string;
   modifier?: number;
 }
@@ -69,12 +70,13 @@ const locale = "de";
 
 export function Attribute({
   attributeId,
+  attributeValue: _attributeValue,
   modifier,
   className,
   ...props
-}: IconD20Props) {
+}: AttributeProps) {
   const attribute = getAttribute(attributeId);
-  const attributeValue = getAttributeValue(attributeId);
+  const attributeValue = _attributeValue ?? getAttributeValue(attributeId);
 
   return (
     // <div className="relative">
@@ -87,7 +89,7 @@ export function Attribute({
       <span className="leading-none text-muted-foreground">
         {attribute?.shorthand[locale]}
       </span>
-      <span className="leading-none font-medium tracking-tighter tabular-nums">
+      <span className="leading-none text-foreground font-medium tracking-tighter tabular-nums">
         {modifier ? (
           <>
             <span className="line-through opacity-50 inline-block mr-1">
