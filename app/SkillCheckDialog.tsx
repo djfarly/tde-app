@@ -223,8 +223,8 @@ export function SkillCheckDialog({
                       : "opacity-0 select-none pointer-events-none"
                   )}
                 >
-                  <div className="relative">
-                    <div className="flex gap-1 items-center">
+                  <div className="relative w-max mx-auto">
+                    <div className="flex gap-1 items-center w-max">
                       <div className="w-16 h-8 leading-8 text-center bg-muted text-muted-foreground border border-border rounded-sm">
                         {lastSkillCheckLogEntry?.skillPoints ?? "-"} FP
                         {/* <ArrowRight className="absolute -right-2.5 fill-card top-[calc(50%-10px)] size-5 text-muted-foreground" /> */}
