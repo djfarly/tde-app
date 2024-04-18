@@ -10,6 +10,12 @@ import { cva, VariantProps } from "class-variance-authority";
 import { log } from "console";
 import { ChevronRight } from "lucide-react";
 import Marquee from "react-fast-marquee";
+import {
+  SkillCheckSkillPointBreakdown,
+  SkillCheckResult,
+  SkillCheck3D20,
+  SkillCheckAttributes,
+} from "../SkillCheck";
 
 const locale = "de";
 
@@ -41,106 +47,27 @@ export default function ChatLogEntrySkillCheck({
 
   return (
     <div className={chatLogSkillCheckVariants({ sendBy })}>
-      <>
-        <div className="opacity-60">Talentprobe</div>
-        <div className="flex gap-2 items-baseline mb-2">
-          <div className="font-semibold">
-            {skills.find(({ id }) => id === logEntry.skillId)!.name[locale]}
-          </div>
-          {logEntry.modifier !== 0 ? (
-            <div className="">{formatNumberAsModifier(logEntry.modifier)}</div>
-          ) : null}
+      <div className="opacity-60">Talentprobe</div>
+      <div className="flex gap-2 items-baseline mb-2">
+        <div className="font-semibold">
+          {skills.find(({ id }) => id === logEntry.skillId)!.name[locale]}
         </div>
-        <div className="flex gap-1 items-center justify-center mb-px">
-          {skillCheckPartIndices.map((part) => (
-            <Attribute
-              key={part}
-              attributeId={skill.attributes[part]}
-              attributeValue={logEntry.attributeValues[part]}
-              modifier={logEntry.modifier}
-              className="w-12 rounded-sm border border-border"
-            />
-          ))}
-        </div>
-        <div className="flex gap-1 items-center justify-center">
-          {skillCheckPartIndices.map((part) => (
-            <div key={part} className="w-12 flex justify-center">
-              <IconD20
-                side={logEntry.rolls[part]}
-                attributeId={skill.attributes[part]}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="relative">
-          <div className="absolute inset-0 grid place-items-center">
-            <Marquee direction="right" autoFill speed={10}>
-              <ChevronRight
-                className={cn(
-                  "size-5 text-border mx-0.5",
-                  sendBy === "me" ? "text-blue-400" : "text-slate-200"
-                )}
-              />
-            </Marquee>
-          </div>
-          <div className="flex gap-1 items-center relative z-10">
-            <div className="w-12 h-8 leading-8 text-center bg-muted text-muted-foreground border border-border rounded-sm">
-              {logEntry?.skillPoints ?? "-"} FP
-              {/* <ArrowRight className="absolute -right-2.5 fill-card top-[calc(50%-10px)] size-5 text-muted-foreground" /> */}
-            </div>
-            {skillCheckPartIndices.map((part) => {
-              const usedSkillPoints =
-                logEntry?.result.parts?.[part].usedSkillPoints;
-              return (
-                <div
-                  key={part}
-                  className="w-12 h-8 leading-8 text-center bg-gradient-to-r from-transparent via-[var(--log-entry-bg)] to-transparent from-15% to-85% empty:via-transparent"
-                >
-                  {usedSkillPoints && usedSkillPoints > 0
-                    ? `-${usedSkillPoints}`
-                    : null}
-                </div>
-              );
-            })}
-            <div
-              className={cn(
-                "w-12 h-8 leading-8 text-center bg-card border border-border rounded-sm bg-red-200 text-red-900",
-                {
-                  "bg-green-200 text-green-900":
-                    (logEntry?.result.remainingSkillPoints ?? -1) >= 0,
-                }
-              )}
-            >
-              {/* <Equal className="absolute -left-2.5 fill-card top-[calc(50%-10px)] size-5 text-muted-foreground" /> */}
-              {logEntry?.result.remainingSkillPoints ?? "–"} FP
-            </div>
-          </div>
-        </div>
-        <div className="text-2xl font-medium text-center mt-2">
-          {skillCheckResultName[logEntry?.result.type!]?.[locale] ?? "–"}
-        </div>
-        <div className="flex justify-center">
-          <QualityLevelBadge
-            level={logEntry?.result.qualityLevel ?? 0}
-            size="md"
-          >
-            Qualitätsstufe {logEntry?.result.qualityLevel ?? "–"}
-          </QualityLevelBadge>
-        </div>
-        {/* {logEntry.result.type === "success" ? (
-          <span className="text-xs">
-            Peter hat eine Probe auf{" "}
-            {skills.find(({ id }) => id === logEntry.skillId)!.name[locale]} mit
-            QS {logEntry.result.qualityLevel} bestanden.
-          </span>
-        ) : (
-          <span className="text-xs">
-            Peter hat eine Probe auf{" "}
-            {skills.find(({ id }) => id === logEntry.skillId)!.name[locale]}{" "}
-            nicht bestanden.
-          </span>
-        )} */}
-      </>
+        {logEntry.modifier !== 0 ? (
+          <div className="">{formatNumberAsModifier(logEntry.modifier)}</div>
+        ) : null}
+      </div>
+      <SkillCheckAttributes
+        skillId={logEntry.skillId}
+        modifier={logEntry.modifier}
+        width={12}
+      />
+      <SkillCheck3D20 skillCheckLogEntry={logEntry} width={12} />
+      <SkillCheckSkillPointBreakdown
+        skillCheckLogEntry={logEntry}
+        width={12}
+        marqueeClassName={sendBy === "me" ? "text-blue-400" : "text-slate-200"}
+      />
+      <SkillCheckResult skillCheckLogEntry={logEntry} />
     </div>
   );
 }

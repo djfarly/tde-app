@@ -26,18 +26,18 @@ function getAttributeValue(attributeId: number) {
 }
 
 const attributeVariants = cva(
-  "flex flex-col p-0.5 items-center justify-evenly",
+  "flex flex-col p-0.5 items-center justify-evenly bg-card border-4 rounded-sm",
   {
     variants: {
       attribute: {
-        COU: "bg-red-200",
-        SGC: "bg-purple-200",
-        INT: "bg-lime-200",
-        CHA: "bg-slate-200",
-        DEX: "bg-yellow-200 ",
-        AGI: "bg-sky-200",
-        CON: "bg-white",
-        STR: "bg-orange-200",
+        COU: "border-red-300",
+        SGC: "border-purple-300",
+        INT: "border-lime-300",
+        CHA: "border-slate-400",
+        DEX: "border-yellow-300",
+        AGI: "border-sky-300",
+        CON: "border-slate-100",
+        STR: "border-orange-300",
         // COU: "bg-red-600 text-white",
         // SGC: "bg-purple-600 text-white",
         // INT: "bg-lime-600 text-white",
@@ -86,7 +86,7 @@ export function Attribute({
         className,
       })}
     >
-      <span className="leading-none text-muted-foreground">
+      <span className="leading-none text-muted-foreground text-sm">
         {attribute?.shorthand[locale]}
       </span>
       <span className="leading-none text-foreground font-medium tracking-tighter tabular-nums">
@@ -112,7 +112,7 @@ export function Attributes({
   attributes: [number, number, number];
 }) {
   return (
-    <div className="flex items-center rounded-sm overflow-clip w-max border border-border">
+    <div className="flex gap-1">
       <Attribute attributeId={attributes[0]} />
       <Attribute attributeId={attributes[1]} />
       <Attribute attributeId={attributes[2]} />

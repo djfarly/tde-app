@@ -76,10 +76,56 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        tada: {
+          "from, to": { transform: "scale3d(1, 1, 1)" },
+          "10%, 20%": {
+            transform: "scale3d(0.97, 0.97, 0.97) rotate3d(0, 0, 1, -1.5deg)",
+          },
+          "30%, 50%, 70%, 90%": {
+            transform: "scale3d(1.03, 1.03, 1.03) rotate3d(0, 0, 1, 1.5deg)",
+          },
+          "40%, 60%, 80%": {
+            transform: "scale3d(1.03, 1.03, 1.03) rotate3d(0, 0, 1, -1.5deg)",
+          },
+        },
+        "head-shake": {
+          "0%": {
+            transform: "translateX(0)",
+          },
+          "6.5%": {
+            transform: "translateX(-3px) rotateY(-8deg)",
+          },
+          "18.5%": {
+            transform: "translateX(2.5px) rotateY(6deg)",
+          },
+          "31.5%": {
+            transform: "translateX(-2px) rotateY(-4deg)",
+          },
+          "43.5%": {
+            transform: "translateX(1.5px) rotateY(2deg)",
+          },
+          "50%": {
+            transform: "translateX(0)",
+          },
+        },
+        pulse: {
+          from: {
+            transform: "scale3d(1, 1, 1)",
+          },
+          "50%": {
+            transform: "scale3d(1.05, 1.05, 1.05)",
+          },
+          to: {
+            transform: "scale3d(1, 1, 1)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        tada: "tada 1.125s cubic-bezier(0.455, 0.030, 0.515, 0.955) both",
+        "head-shake": "head-shake 1s ease",
+        pulse: "pulse 1s ease",
       },
     },
   },

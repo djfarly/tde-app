@@ -3,6 +3,7 @@ import ChatLogEntryMessage from "./Message";
 import ChatLogEntrySkillCheck from "./SkillCheck";
 import { send } from "process";
 import { cn } from "@/lib/utils";
+import { CircleCheckBig } from "lucide-react";
 
 const locale = "de";
 
@@ -11,8 +12,14 @@ const entryComponent = {
   skillCheck: ChatLogEntrySkillCheck,
 } as const;
 
+const entryTypeLabel = {
+  message: null,
+  skillCheck: "Talentprobe",
+} as const;
+
 export default function ChatLogEntry({ logEntry }: { logEntry: LogEntry }) {
-  const EntryComponent = entryComponent[logEntry.type];
+  const Component = entryComponent[logEntry.type];
+  const typelabel = entryTypeLabel[logEntry.type];
 
   const sendBy = logEntry.id === "1" || logEntry.id === "2" ? "other" : "me";
 
@@ -23,8 +30,17 @@ export default function ChatLogEntry({ logEntry }: { logEntry: LogEntry }) {
         sendBy === "me" ? "self-end items-end" : "self-start items-start"
       )}
     >
-      <EntryComponent logEntry={logEntry as never} sendBy={sendBy} />
-      <div className={cn("text-xs px-3 text-muted-foreground")}>
+      <Component logEntry={logEntry as never} sendBy={sendBy} />
+      <div
+        className={cn(
+          "text-xs px-3 text-muted-foreground inline-flex items-center gap-[0.5ch]"
+        )}
+      >
+        {typelabel ? (
+          <>
+            <CircleCheckBig className="size-3" /> {typelabel} –{" "}
+          </>
+        ) : null}
         {logEntry.createdAt.toLocaleTimeString(locale)}
       </div>
     </div>

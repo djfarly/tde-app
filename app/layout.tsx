@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn(alegreya.variable, alegreyaSans.variable)}>
       <body>
-        <TooltipProvider>{children}</TooltipProvider>
+        <TooltipProvider delayDuration={500}>{children}</TooltipProvider>
         <Toaster />
       </body>
     </html>

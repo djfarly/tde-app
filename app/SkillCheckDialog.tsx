@@ -1,7 +1,7 @@
 "use client";
 
 import { attributes, conditions, skills } from "@/lib/skills";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,12 @@ import { ConditionInput } from "./ConditionInput";
 import { ModifierInput } from "./ModifierInput";
 import { QualityLevelBadge } from "./QualityLevelBadge";
 import { RollableD20 } from "./RollableD20";
+import {
+  SkillCheck3D20Rollable,
+  SkillCheckAttributes,
+  SkillCheckResult,
+  SkillCheckSkillPointBreakdown,
+} from "@/components/SkillCheck";
 
 // temporary
 const locale = "de";
@@ -99,9 +105,11 @@ export function SkillCheckDialog({
     ({ level }) => level > 0
   );
 
+  const dialogContentRef = useRef<HTMLDivElement>(null);
+
   return (
     <Dialog open={true} onOpenChange={() => onClose()}>
-      <DialogContent>
+      <DialogContent ref={dialogContentRef}>
         <DialogHeader className="items-center">
           <DialogTitle>{skill.name[locale]}</DialogTitle>
           <DialogDescription>Talentprobe</DialogDescription>
@@ -193,27 +201,16 @@ export function SkillCheckDialog({
                   : "Probe nicht möglich"}
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex gap-1 items-center justify-center">
-                {skillCheckPartIndices.map((part) => (
-                  <Attribute
-                    key={part}
-                    attributeId={skill.attributes[part]}
-                    modifier={totalModifier}
-                    className="w-16 rounded-sm border border-border"
-                  />
-                ))}
-              </div>
-              <div className="flex gap-1 items-center justify-center">
-                {skillCheckPartIndices.map((part) => (
-                  <RollableD20
-                    key={part}
-                    dieIndex={part}
-                    side={lastSkillCheckLogEntry?.rolls[part]}
-                    attributeId={skill.attributes[part]}
-                  />
-                ))}
-              </div>
+            <div className="flex flex-col gap-1 items-center">
+              <SkillCheckAttributes
+                skillId={skill.id}
+                modifier={totalModifier}
+                width={16}
+              />
+              <SkillCheck3D20Rollable
+                skillCheckLogEntry={lastSkillCheckLogEntry}
+                skillId={skill.id}
+              />
               <div className="relative">
                 <div
                   className={cn(
@@ -223,64 +220,16 @@ export function SkillCheckDialog({
                       : "opacity-0 select-none pointer-events-none"
                   )}
                 >
-                  <div className="relative w-max mx-auto">
-                    <div className="flex gap-1 items-center w-max">
-                      <div className="w-16 h-8 leading-8 text-center bg-muted text-muted-foreground border border-border rounded-sm">
-                        {lastSkillCheckLogEntry?.skillPoints ?? "-"} FP
-                        {/* <ArrowRight className="absolute -right-2.5 fill-card top-[calc(50%-10px)] size-5 text-muted-foreground" /> */}
-                      </div>
-                      {skillCheckPartIndices.map((part) => {
-                        const usedSkillPoints =
-                          lastSkillCheckLogEntry?.result.parts?.[part]
-                            .usedSkillPoints;
-                        return (
-                          <div
-                            key={part}
-                            className="w-16 h-8 leading-8 text-center bg-gradient-to-r from-transparent via-card to-transparent from-15% to-85% empty:via-transparent"
-                          >
-                            {usedSkillPoints && usedSkillPoints > 0
-                              ? `-${usedSkillPoints}`
-                              : null}
-                          </div>
-                        );
-                      })}
-                      <div
-                        className={cn(
-                          "w-16 h-8 leading-8 text-center bg-card border border-border rounded-sm bg-red-200 text-red-900",
-                          {
-                            "bg-green-200 text-green-900":
-                              (lastSkillCheckLogEntry?.result
-                                .remainingSkillPoints ?? -1) >= 0,
-                          }
-                        )}
-                      >
-                        {/* <Equal className="absolute -left-2.5 fill-card top-[calc(50%-10px)] size-5 text-muted-foreground" /> */}
-                        {lastSkillCheckLogEntry?.result.remainingSkillPoints ??
-                          "–"}{" "}
-                        FP
-                      </div>
-                    </div>
-                    <div className="absolute inset-0 grid place-items-center -z-10">
-                      <Marquee direction="right" autoFill speed={10}>
-                        <ChevronRight className="size-5 text-border mx-0.5" />
-                      </Marquee>
-                    </div>
-                  </div>
-                  <div className="text-3xl font-medium text-center mt-2">
-                    {skillCheckResultName[
-                      lastSkillCheckLogEntry?.result.type!
-                    ]?.[locale] ?? "–"}
-                  </div>
-                  <div className="flex justify-center">
-                    <QualityLevelBadge
-                      level={lastSkillCheckLogEntry?.result.qualityLevel ?? 0}
-                      size="lg"
-                    >
-                      Qualitätsstufe{" "}
-                      {lastSkillCheckLogEntry?.result.qualityLevel ?? "–"}
-                    </QualityLevelBadge>
-                  </div>
-                  <div className="flex gap-1 pt-2 items-center justify-center">
+                  <SkillCheckSkillPointBreakdown
+                    skillCheckLogEntry={lastSkillCheckLogEntry}
+                    width={16}
+                    collisionBoundary={dialogContentRef.current}
+                  />
+                  <SkillCheckResult
+                    skillCheckLogEntry={lastSkillCheckLogEntry}
+                    size="lg"
+                  />
+                  <div className="flex gap-3 pt-6 items-center justify-center">
                     <Button
                       className="w-max"
                       size="sm"
@@ -290,6 +239,15 @@ export function SkillCheckDialog({
                       }}
                     >
                       Zurücksetzen
+                    </Button>
+                    <Button
+                      className="w-max"
+                      size="sm"
+                      onClick={() => {
+                        onClose();
+                      }}
+                    >
+                      Fertig
                     </Button>
                   </div>
                 </div>

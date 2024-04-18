@@ -71,10 +71,8 @@ export function Sheet({
             <TableHead>Talent</TableHead>
             <TableHead>Probe</TableHead>
             <TableHead>BE</TableHead>
-            {/* <TableHead>Sf</TableHead> */}
             <TableHead>Fw</TableHead>
             <TableHead>%</TableHead>
-            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -97,7 +95,9 @@ export function Sheet({
                 <TableCell>
                   <div className="flex items-center">
                     <GroupIcon className="size-5 mr-4" />
-                    <span className="font-medium">{skill.name[locale]}</span>
+                    <span className="font-medium text-base">
+                      {skill.name[locale]}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -105,18 +105,16 @@ export function Sheet({
                 </TableCell>
                 <TableCell>
                   {skill.isEncumbranceApplicable === "maybe" ? (
-                    <ShieldQuestion className="size-5 text-slate-700" />
+                    <ShieldQuestion className="size-5 text-slate-500" />
                   ) : skill.isEncumbranceApplicable ? (
-                    <ShieldAlert className="size-5 text-slate-700" />
+                    <ShieldAlert className="size-5 text-slate-500" />
                   ) : (
                     <ShieldOff className="size-5 text-slate-300" />
                   )}
                 </TableCell>
                 {/* <TableCell>{skill.increaseFactor}</TableCell> */}
-                <TableCell className="text-right">
-                  <span className="font-medium tabular-nums">
-                    {skillPoints}
-                  </span>
+                <TableCell className="text-right font-medium tabular-nums text-lg">
+                  {skillPoints}
                 </TableCell>
                 <TableCell>
                   <Chance
@@ -124,7 +122,6 @@ export function Sheet({
                     skillPoints={skillPoints}
                   />
                 </TableCell>
-                <TableCell>–</TableCell>
               </TableRow>
             );
           })}
