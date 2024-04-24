@@ -1,17 +1,21 @@
+"use client";
+
 import {
   ScrollArea,
   ScrollAreaViewport,
   ScrollBar,
 } from "@/components/ui/scroll-area";
-import { LogEntry } from "@/lib/log";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronsDown } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ChatInput from "../ChatInput";
-import ChatLogEntry from "../ChatLogEntry";
+import ChatMessage from "../ChatMessage";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
+import { Game, Message, MessageInsert, User } from "@/supabase/schema";
+import { useRouter } from "next/navigation";
+import { FoundGameMessage } from "@/services";
 
 const locale = "de";
 
@@ -74,11 +78,15 @@ function useScrollAreaAutoScroll({
 const MotionButton = motion(Button);
 
 export default function Chat({
-  logEntries,
-  onAddLogEntry,
+  messages = [],
+  onAddMessage,
+  gameId,
+  currentUserId,
 }: {
-  logEntries: LogEntry[];
-  onAddLogEntry: (entry: LogEntry) => void;
+  messages?: FoundGameMessage[];
+  onAddMessage?: (message: MessageInsert) => void;
+  gameId: Game["id"];
+  currentUserId: User["id"];
 }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -93,19 +101,23 @@ export default function Chat({
     viewportRef,
     scrollAreaRef,
     endRef,
-    data: logEntries,
+    data: messages,
   });
+
+  const router = useRouter();
+
+  async function handleAddMessage(message: MessageInsert) {
+    onAddMessage?.(message);
+    router.refresh();
+  }
 
   return (
     <div className="relative h-full [--chat-input-height:8rem]">
-      <ScrollArea
-        className="w-full h-full rounded-lg bg-muted"
-        ref={scrollAreaRef}
-      >
+      <ScrollArea className="w-full h-full bg-muted" ref={scrollAreaRef}>
         <ScrollAreaViewport ref={viewportRef}>
-          <div className="flex h-full flex-col py-4 px-3">
+          <div className="flex flex-col h-full px-3 py-4">
             <Badge
-              className="absolute top-2 right-2 pl-1 bg-card items-center select-none gap-2 z-20"
+              className="absolute z-20 items-center gap-2 pl-1 select-none top-2 right-2 bg-card"
               variant="outline"
               size="sm"
               asChild
@@ -133,8 +145,9 @@ export default function Chat({
                   exit={{ y: 16, opacity: 0 }}
                   style={{ x: "-50%" }}
                   variant="outline"
-                  size="icon"
-                  className="absolute bottom-36 left-1/2 z-20 rounded-full shadow-md"
+                  size="sm"
+                  aspect="square"
+                  className="absolute z-20 rounded-full shadow-md bottom-36 left-1/2"
                   onClick={scrollToBottom}
                 >
                   <ChevronsDown className="size-4" />
@@ -143,8 +156,12 @@ export default function Chat({
             </AnimatePresence>
             <div className="flex-1 pb-32">
               <div className="flex flex-col items-start justify-end h-full gap-2">
-                {logEntries.map((logEntry) => (
-                  <ChatLogEntry key={logEntry.id} logEntry={logEntry} />
+                {messages.map((message) => (
+                  <ChatMessage
+                    key={message.id}
+                    message={message}
+                    sendBy={currentUserId === message.userId ? "me" : "other"}
+                  />
                 ))}
               </div>
               <div ref={endRef} />
@@ -153,7 +170,11 @@ export default function Chat({
         </ScrollAreaViewport>
         <ScrollBar className="mt-1 mb-28 h-[calc(100%-var(--chat-input-height)-0.25rem)]" />
       </ScrollArea>
-      <ChatInput onAddLogEntry={onAddLogEntry} />
+      <ChatInput
+        onAddMessage={handleAddMessage}
+        gameId={gameId}
+        currentUserId={currentUserId}
+      />
     </div>
   );
 }

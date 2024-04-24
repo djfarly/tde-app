@@ -25,3 +25,11 @@ export function formatNumberAsModifier(value: number | `*${number}`) {
     `${value}`
   );
 }
+
+export function formatAsPercentage(value: number) {
+  return value.toLocaleString("de-DE", {
+    style: "percent",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 1,
+  });
+}

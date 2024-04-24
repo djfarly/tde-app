@@ -146,39 +146,39 @@ export const d100 = getDie<
 export function rollD4() {
   return d4.next().value;
 }
-export type D4 = ReturnType<typeof rollD4>;
+export type D4Value = ReturnType<typeof rollD4>;
 
 export function rollD6() {
   return d6.next().value;
 }
-export type D6 = ReturnType<typeof rollD6>;
+export type D6Value = ReturnType<typeof rollD6>;
 
 export function rollD8() {
   return d8.next().value;
 }
-export type D8 = ReturnType<typeof rollD8>;
+export type D8Value = ReturnType<typeof rollD8>;
 
 export function rollD10() {
   return d10.next().value;
 }
-export type D10 = ReturnType<typeof rollD10>;
+export type D10Value = ReturnType<typeof rollD10>;
 
 export function rollD12() {
   return d12.next().value;
 }
-export type D12 = ReturnType<typeof rollD12>;
+export type D12Value = ReturnType<typeof rollD12>;
 
 export function rollD20() {
   return d20.next().value;
 }
-export type D20 = ReturnType<typeof rollD20>;
+export type D20Value = ReturnType<typeof rollD20>;
 
 export function roll3D20() {
   return [d20.next().value, d20.next().value, d20.next().value] as const;
 }
-export type _3D20 = ReturnType<typeof roll3D20>;
+export type _3D20Values = ReturnType<typeof roll3D20>;
 
 export function rollD100() {
   return d100.next().value;
 }
-export type D100 = ReturnType<typeof rollD100>;
+export type D100Value = ReturnType<typeof rollD100>;

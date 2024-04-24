@@ -7,26 +7,28 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { rollD6 } from "@/lib/dice";
-import { LogEntry } from "@/lib/log";
+import { Game, MessageInsert, User } from "@/supabase/schema";
 import { CornerDownLeft, Dices } from "lucide-react";
 
-let id = 100;
-
 export default function ChatInput({
-  onAddLogEntry,
+  onAddMessage,
+  gameId,
+  currentUserId,
 }: {
-  onAddLogEntry: (entry: LogEntry) => void;
+  onAddMessage?: (message: MessageInsert) => void;
+  gameId: Game["id"];
+  currentUserId: User["id"];
 }) {
   return (
     <form
       className="absolute left-0 right-0 bottom-0 h-[--chat-input-height] z-10 rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
       onSubmit={(event) => {
         event.preventDefault();
-        onAddLogEntry({
+        onAddMessage?.({
+          gameId,
+          userId: currentUserId,
           type: "message",
-          id: (id++).toString(),
-          createdAt: new Date(),
-          message: event.currentTarget.message.value,
+          text: event.currentTarget.message.value,
         });
         event.currentTarget.reset();
       }}
@@ -37,7 +39,7 @@ export default function ChatInput({
       <Textarea
         id="message"
         placeholder="Type your message here..."
-        className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="p-3 border-0 shadow-none resize-none min-h-12 focus-visible:ring-0 focus-visible:ring-offset-0"
       />
       <div className="flex items-center p-3 pt-0">
         {/* <Tooltip>
@@ -54,13 +56,14 @@ export default function ChatInput({
             <Button
               type="button"
               variant="ghost"
-              size="icon"
+              size="sm"
+              aspect="square"
               onClick={() => {
-                onAddLogEntry({
+                onAddMessage?.({
+                  gameId,
+                  userId: currentUserId,
                   type: "message",
-                  id: (id++).toString(),
-                  createdAt: new Date(),
-                  message: rollD6().toString(),
+                  text: `rolled ${rollD6()}`,
                 });
               }}
             >

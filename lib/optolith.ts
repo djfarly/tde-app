@@ -70,3 +70,59 @@ export enum AttributeId {
   Constitution = "ATTR_7",
   Strength = "ATTR_8",
 }
+
+export interface CharacterData {
+  clientVersion: string;
+  dateCreated: string;
+  dateModified: string;
+  id: string;
+  phase: number;
+  name: string;
+  ap: { total: number };
+  el: string;
+  r: string;
+  rv: string;
+  c: string;
+  p: string;
+  professionName?: string;
+  sex: string;
+  pers: {
+    placeofbirth: string;
+    haircolor: number;
+    eyecolor: number;
+    size: string;
+    weight: string;
+    socialstatus: number;
+  };
+  attr: { values: { id: AttributeId; value: number }[] };
+  activatable: Record<string, Record<string, number | string>[]>;
+  talents: Partial<Record<SkillId, number>>;
+  ct: Record<string, number>;
+  spells: Record<string, number>;
+  cantrips: string[];
+  liturgies: Record<string, number>;
+  blessings: string[];
+  belongings: {
+    items: Record<
+      string,
+      {
+        id: string;
+        name: string;
+        amount: number;
+        gr?: number;
+        weight?: number;
+        price?: number;
+        [key: string]: unknown;
+      }
+    >;
+    armorZones: Record<string, unknown>;
+  };
+  rules: {
+    higherParadeValues: number;
+    attributeValueLimit: boolean;
+    enableAllRuleBooks: boolean;
+    enabledRuleBooks: unknown[];
+    enableLanguageSpecializations: boolean;
+  };
+  pets: Record<string, unknown>;
+}

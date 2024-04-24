@@ -1,35 +1,16 @@
 "use client";
 
-import { attributes, conditions, skills } from "@/lib/skills";
-import { ComponentProps, ReactNode, useMemo, useState } from "react";
-
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import testChar from "@/lib/chars/faffi.json";
-import { getTotalModifierForConditions } from "@/lib/core/conditions";
-import { formatNumberAsModifier } from "@/lib/format";
-import { LogEntry, SkillCheckLogEntry } from "@/lib/log";
-import { performSkillCheck } from "@/lib/performCheck";
+import { Attribute } from "@/components/Attribute";
+import { D20 } from "@/components/D20";
+import { D20Rollable } from "@/components/D20Rollable";
+import { QualityLevelBadge } from "@/components/QualityLevelBadge";
 import { skillCheckPartIndices, skillCheckResultName } from "@/lib/skillCheck";
+import { skills } from "@/lib/core/skills";
 import { cn } from "@/lib/utils";
+import { SkillCheckData } from "@/supabase/schema";
 import { ChevronRight } from "lucide-react";
+import { ComponentProps, ReactNode } from "react";
 import Marquee from "react-fast-marquee";
-import { ActivateConditionMenu } from "@/app/ActivateConditionMenu";
-import { Attribute } from "@/app/Attribute";
-import { Chance } from "@/app/Chance";
-import { ConditionInput } from "@/app/ConditionInput";
-import { ModifierInput } from "@/app/ModifierInput";
-import { QualityLevelBadge } from "@/app/QualityLevelBadge";
-import { RollableD20 } from "@/app/RollableD20";
-import { D20 } from "@/lib/dice";
-import { IconD20 } from "@/app/IconD20";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import {
   Table,
   TableBody,
@@ -38,12 +19,14 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { getAttributeValues } from "@/lib/core/attributes";
 
 const locale = "de";
 
 function SkillCheckColumns({ children }: { children: ReactNode }) {
   return (
-    <div className="flex gap-1 items-center justify-center w-max relative z-10">
+    <div className="relative z-10 flex items-center justify-center gap-1 w-max">
       {children}
     </div>
   );
@@ -53,10 +36,12 @@ export function SkillCheckAttributes({
   skillId,
   modifier,
   width,
+  attributeValues,
 }: {
   skillId: number;
   modifier: number;
   width?: 16 | 12;
+  attributeValues: [number, number, number];
 }) {
   const skill = skills.find(({ id }) => id === skillId)!;
 
@@ -66,6 +51,7 @@ export function SkillCheckAttributes({
         <Attribute
           key={part}
           attributeId={skill.attributes[part]}
+          attributeValue={attributeValues[part]}
           modifier={modifier}
           className={cn({
             "w-12": width === 12,
@@ -79,20 +65,20 @@ export function SkillCheckAttributes({
 
 export function SkillCheck3D20Rollable({
   skillId,
-  skillCheckLogEntry,
+  skillCheckData,
 }: {
   skillId: number;
-  skillCheckLogEntry?: SkillCheckLogEntry;
+  skillCheckData?: SkillCheckData;
 }) {
   const skill = skills.find(({ id }) => id === skillId)!;
 
   return (
     <SkillCheckColumns>
       {skillCheckPartIndices.map((part) => (
-        <RollableD20
+        <D20Rollable
           key={part}
           dieIndex={part}
-          side={skillCheckLogEntry?.rolls[part]}
+          side={skillCheckData?.rolls[part]}
           attributeId={skill.attributes[part]}
         />
       ))}
@@ -101,13 +87,13 @@ export function SkillCheck3D20Rollable({
 }
 
 export function SkillCheck3D20({
-  skillCheckLogEntry,
+  skillCheckData,
   width,
 }: {
-  skillCheckLogEntry: SkillCheckLogEntry;
+  skillCheckData: SkillCheckData;
   width?: 16 | 12;
 }) {
-  const skill = skills.find(({ id }) => id === skillCheckLogEntry.skillId)!;
+  const skill = skills.find(({ id }) => id === skillCheckData.skillId)!;
 
   return (
     <SkillCheckColumns>
@@ -119,8 +105,8 @@ export function SkillCheck3D20({
             "w-16": width === 16,
           })}
         >
-          <IconD20
-            side={skillCheckLogEntry?.rolls[part]}
+          <D20
+            side={skillCheckData?.rolls[part]}
             attributeId={skill.attributes[part]}
           />
         </div>
@@ -130,12 +116,12 @@ export function SkillCheck3D20({
 }
 
 export function SkillCheckSkillPointBreakdown({
-  skillCheckLogEntry,
+  skillCheckData,
   width,
   marqueeClassName,
   collisionBoundary,
 }: {
-  skillCheckLogEntry?: SkillCheckLogEntry;
+  skillCheckData?: SkillCheckData;
   width?: 16 | 12;
   marqueeClassName?: string;
   collisionBoundary?: ComponentProps<
@@ -143,11 +129,11 @@ export function SkillCheckSkillPointBreakdown({
   >["collisionBoundary"];
 }) {
   return (
-    <div className="relative w-max mx-auto">
+    <div className="relative mx-auto w-max">
       <div className="absolute inset-0 grid place-items-center">
         <Marquee direction="right" autoFill speed={10}>
           <ChevronRight
-            className={cn("text-slate-200 size-5 mx-0.5", marqueeClassName)}
+            className={cn("text-stone-200 size-5 mx-0.5", marqueeClassName)}
           />
         </Marquee>
       </div>
@@ -161,11 +147,11 @@ export function SkillCheckSkillPointBreakdown({
             }
           )}
         >
-          Fw {skillCheckLogEntry?.skillPoints ?? "-"}
+          Fw {skillCheckData?.skillPoints ?? "-"}
         </div>
         {skillCheckPartIndices.map((part) => {
           const usedSkillPoints =
-            skillCheckLogEntry?.result.parts?.[part].usedSkillPoints;
+            skillCheckData?.result.parts?.[part].usedSkillPoints;
           return (
             <div
               key={part}
@@ -190,14 +176,13 @@ export function SkillCheckSkillPointBreakdown({
                 "h-8 leading-8 text-center bg-card border border-border rounded-sm border-rose-400 bg-rose-500 text-rose-50",
                 {
                   "border-emerald-400 bg-emerald-500 text-emerald-50":
-                    (skillCheckLogEntry?.result.remainingSkillPoints ?? -1) >=
-                    0,
+                    (skillCheckData?.result.remainingSkillPoints ?? -1) >= 0,
                   "w-12": width === 12,
                   "w-16": width === 16,
                 }
               )}
             >
-              {skillCheckLogEntry?.result.remainingSkillPoints ?? "–"} FP
+              {skillCheckData?.result.remainingSkillPoints ?? "–"} FP
             </div>
           </TooltipTrigger>
           <TooltipContent
@@ -225,7 +210,7 @@ function QualityLevelTable() {
   */
 
   return (
-    <Table variant="compact" className="tabular-nums text-center">
+    <Table variant="compact" className="text-center tabular-nums">
       <TableHeader>
         <TableRow>
           <TableHead className="text-center">
@@ -271,10 +256,10 @@ function QualityLevelTable() {
 }
 
 export function SkillCheckResult({
-  skillCheckLogEntry,
+  skillCheckData,
   size = "md",
 }: {
-  skillCheckLogEntry?: SkillCheckLogEntry;
+  skillCheckData?: SkillCheckData;
   size?: "md" | "lg";
 }) {
   return (
@@ -284,20 +269,18 @@ export function SkillCheckResult({
           "text-2xl": size === "md",
           "text-3xl": size === "lg",
           "animate-head-shake delay-100":
-            skillCheckLogEntry?.result.isSuccess === false,
-          "animate-tada delay-100":
-            skillCheckLogEntry?.result.isSuccess === true,
+            skillCheckData?.result.isSuccess === false,
+          "animate-tada delay-100": skillCheckData?.result.isSuccess === true,
         })}
       >
-        {skillCheckResultName[skillCheckLogEntry?.result.type!]?.[locale] ??
-          "–"}
+        {skillCheckResultName[skillCheckData?.result.type!]?.[locale] ?? "–"}
       </div>
       <div className="flex justify-center">
         <QualityLevelBadge
-          level={skillCheckLogEntry?.result.qualityLevel ?? 0}
+          level={skillCheckData?.result.qualityLevel ?? 0}
           size={size}
         >
-          Qualitätsstufe {skillCheckLogEntry?.result.qualityLevel ?? "–"}
+          Qualitätsstufe {skillCheckData?.result.qualityLevel ?? "–"}
         </QualityLevelBadge>
       </div>
     </div>
